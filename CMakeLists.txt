@@ -110,6 +110,7 @@ if(HASH_ENABLE_TESTS)
 
     add_executable(main_test 
         tests/test_md5.cpp
+        tests/test_tools.cpp
     )
 
     target_link_libraries(main_test PRIVATE hash gtest_main gmock)
