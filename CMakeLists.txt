@@ -109,7 +109,7 @@ if(HASH_ENABLE_TESTS)
     FetchContent_MakeAvailable(googletest)
 
     add_executable(main_test 
-	   tests/test_file.cpp
+        tests/test_md5.cpp
     )
 
     target_link_libraries(main_test PRIVATE hash gtest_main gmock)
