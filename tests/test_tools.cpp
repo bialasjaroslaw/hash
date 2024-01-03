@@ -6,7 +6,6 @@
 
 #include <hash/hash-tools.h>
 
-namespace fs = std::filesystem;
 using namespace ::testing;
 
 
