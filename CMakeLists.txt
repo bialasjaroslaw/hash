@@ -13,14 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 90)
 
-include(FetchContent)
-
-FetchContent_Declare(
-    _project_options
-    URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
-)
-FetchContent_MakeAvailable(_project_options)
-
 # set(TEXT_PROCESSING_ENABLE_TESTS OFF)
 # FetchContent_Declare(
 # 	stp
@@ -37,6 +29,13 @@ target_include_directories(hash PUBLIC include)
 target_include_directories(hash PRIVATE include/hash)
 
 if(DEVELOPER_BUILD)
+    include(FetchContent)
+
+    FetchContent_Declare(
+        _project_options
+        URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
+    )
+    FetchContent_MakeAvailable(_project_options)
     set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
     if(NOT CXX_CPPCHECK)
         set(ENABLE_CPPCHECK "")
@@ -58,6 +57,15 @@ if(DEVELOPER_BUILD)
         set(ENABLE_STACK_PROTECTION "ENABLE_STACK_PROTECTION")
         set(ENABLE_OVERFLOW_PROTECTION "ENABLE_OVERFLOW_PROTECTION")
         set(WARNINGS_AS_ERRORS "WARNINGS_AS_ERRORS")
+
+        target_compile_definitions(hash INTERFACE 
+            _GLIBCXX_CONCEPT_CHECKS 
+            _GLIBCXX_ASSERTIONS 
+            _GLIBCXX_DEBUG 
+            _GLIBCXX_DEBUG_PEDANTIC
+            _GLIBCXX_DEBUG_BACKTRACE
+            _GLIBCXX_SANITIZE_VECTOR
+        )
     else()
         set(ENABLE_GCC_ANALYZER "")
         set(GCC_WARNINGS "")
