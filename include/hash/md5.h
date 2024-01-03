@@ -22,12 +22,30 @@ constexpr uint32_t rotate_left(uint32_t x, uint32_t n) {
   return (x << n) | (x >> (32 - n));
 }
 
+bool constexpr is_positive_power_two(uint64_t value){
+  if (value == 0)
+    return false;
+  return !(value & (value - 1));
+}
+
+template <typename D>
+void constexpr byteswap(D *dst) {
+  constexpr auto size = sizeof(D);
+  static_assert(is_positive_power_two(size));
+  auto* ptr = reinterpret_cast<char*>(dst);
+  auto* end = ptr + size - 1;
+  while(ptr < end){
+    std::swap(*ptr, *end);
+    ++ptr;
+    --end;
+  }
+}
+
 template <typename D, typename S>
-void constexpr byteswap(D *dst, const S *src) {
+void constexpr byteswap_to_le(D *dst, const S *src) {
   memcpy(dst, src, 4);
   if constexpr (std::endian::native == std::endian::big) {
-    std::swap(dst + 0, dst + 3);
-    std::swap(dst + 1, dst + 2);
+    byteswap(dst);
   }
 }
 
@@ -43,7 +61,7 @@ class md5_hasher {
       _input[offset++] = *(input_buffer + i);
       if (offset % 64 == 0) {
         for (unsigned int j = 0; j < 16; ++j) {
-          byteswap(input + j, _input + j * 4);
+          byteswap_to_le(input + j, _input + j * 4);
         }
         step(_buffer, input);
         offset = 0;
@@ -58,7 +76,7 @@ class md5_hasher {
     _size -= padding_length;
 
     for (unsigned int j = 0; j < 14; ++j) {
-      byteswap(input + j, _input + j * 4);
+      byteswap_to_le(input + j, _input + j * 4);
     }
     input[14] = static_cast<uint32_t>(_size * 8);
     input[15] = static_cast<uint32_t>((_size * 8) >> 32);
@@ -66,7 +84,7 @@ class md5_hasher {
     step(_buffer, input);
 
     for (unsigned int i = 0; i < 4; ++i) {
-      byteswap(_digest + i * 4, reinterpret_cast<uint8_t *>(_buffer + i));
+      byteswap_to_le(_digest + i * 4, reinterpret_cast<uint8_t *>(_buffer + i));
     }
   }
 

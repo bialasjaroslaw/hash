@@ -8,11 +8,21 @@
 
 using namespace ::testing;
 
+TEST(Md5, ByteSwapUint8)
+{
+    uint8_t data[] = {0xd4, 0x1d, 0x8c, 0xd9};
+    uint8_t expected[] = {0xd4, 0x1d, 0x8c, 0xd9};
+    byteswap(data);
+    for(int idx = 0 ; idx < 4 ; ++idx){
+            EXPECT_THAT(data[idx], Eq(expected[idx]));
+    }
+}
+
 TEST(Md5, ByteSwapOnBigEndian)
 {
     uint8_t data[] = {0xd4, 0x1d, 0x8c, 0xd9};
     uint8_t converted[4];
-    byteswap(converted, data);
+    byteswap_to_le(converted, data);
     for(int idx = 0 ; idx < 4 ; ++idx)
     {
         if constexpr (std::endian::native == std::endian::big)
