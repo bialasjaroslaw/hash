@@ -22,7 +22,6 @@ set(CMAKE_C_STANDARD 90)
 # FetchContent_MakeAvailable(stp)
 
 add_library(hash 
-    include/hash/md5.h
     src/md5.cpp
 )
 target_include_directories(hash PUBLIC include)

@@ -20,5 +20,5 @@ TEST(Tools, StringToHash)
 {
     std::string input = "e4d909c290d0fb1ca068ffaddf22cbd0";
     std::vector<uint8_t> expected{0xe4, 0xd9, 0x09, 0xc2, 0x90, 0xd0, 0xfb, 0x1c, 0xa0, 0x68, 0xff, 0xad, 0xdf, 0x22, 0xcb, 0xd0};
-    EXPECT_THAT(Hash::from_string(input), Eq(expected));
+    EXPECT_THAT(Hash::from_string(input), ContainerEq(expected));
 }
