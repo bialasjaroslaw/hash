@@ -13,28 +13,26 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_C_STANDARD 90)
 
-# set(TEXT_PROCESSING_ENABLE_TESTS OFF)
-# FetchContent_Declare(
-# 	stp
-# 	GIT_REPOSITORY https://github.com/bialasjaroslaw/stp.git
-# 	GIT_TAG        df8359facbeaddee20f8f0061e4a3ca7da626dfa
-# )
-# FetchContent_MakeAvailable(stp)
-
 add_library(hash 
     src/md5.cpp
 )
 target_include_directories(hash PUBLIC include)
 target_include_directories(hash PRIVATE include/hash)
 
-if(DEVELOPER_BUILD)
-    include(FetchContent)
+include(Packages.cmake)
+add_dependency(
+    NAME googletest
+    PACKAGE GTest
+    URL https://github.com/google/googletest/archive/refs/tags/release-1.12.1.zip
+)
+add_dependency(
+    NAME _project_options 
+    URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
+)
 
-    FetchContent_Declare(
-        _project_options
-        URL https://github.com/aminya/project_options/archive/refs/tags/v0.33.0.zip
-    )
-    FetchContent_MakeAvailable(_project_options)
+if(DEVELOPER_BUILD)
+    use_dependency(_project_options)
+    
     set(ENABLE_CPPCHECK "ENABLE_CPPCHECK")
     if(NOT CXX_CPPCHECK)
         set(ENABLE_CPPCHECK "")
@@ -101,26 +99,20 @@ if(DEVELOPER_BUILD)
 endif()
 
 if(HASH_ENABLE_TESTS)
-    include(FetchContent)
     include(CTest)
     include(GoogleTest)
 
     enable_testing()
-    FetchContent_Declare(
-    	googletest
-    	GIT_REPOSITORY https://github.com/google/googletest.git
-    	GIT_TAG        58d77fa8070e8cec2dc1ed015d66b454c8d78850 # release-1.12.1
-    )
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    FetchContent_MakeAvailable(googletest)
+    use_dependency(GTest)
 
     add_executable(main_test 
         tests/test_md5.cpp
         tests/test_tools.cpp
     )
 
-    target_link_libraries(main_test PRIVATE hash gtest_main gmock)
+    target_link_libraries(main_test PRIVATE hash GTest::gtest_main GTest::gmock )
     target_link_libraries(main_test INTERFACE 
         ${PROJECT_NAME}_project_options 
         ${PROJECT_NAME}_project_warnings
